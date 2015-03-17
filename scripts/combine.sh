@@ -33,7 +33,7 @@ if [[ "$SOFTDEVICE_SERIES" == "110" ]]; then
 		ADD_SOFTDEVICE="${SOFTDEVICE_DIR}/${SOFTDEVICE}_softdevice.hex -intel"
 	fi
 	if [[ "$add_binary" == true ]]; then
-		ADD_BINARY="crownstone.bin -binary -offset 0x00016000"
+		ADD_BINARY="CROWNSTONE.bin -binary -offset 0x00016000"
 	fi
 else
 	if [[ "$add_softdevice" == true ]]; then

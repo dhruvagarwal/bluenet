@@ -39,14 +39,19 @@ TICK_CONTINUOUSLY=1
 HARDWARE_VERSION=0x001D
 
 # SOFTDEVICE_DIR - the directory where the .hex SoftDevice can be found
-SOFTDEVICE_DIR=/home/dhruv/dhruv/ble/s110_nrf51822_7.1.0
+SOFTDEVICE_DIR=/opt/softdevices
+
 # This is the directory where the cross-compiler resides
-COMPILER_PATH=/opt/gcc-arm-none-eabi-4_8-2014q3
+COMPILER_PATH=/opt/compiler/gcc-arm-none-eabi-4_8-2014q3
 
 # The compiler type 
 COMPILER_TYPE=arm-none-eabi
 
+# The JLink utility (when using the Segger to flash the nRF)
+JLINK=/usr/bin/JLinkExe
 
+# The JLink utilty that can be used with gdb
+JLINK_GDB_SERVER=/usr/bin/JLinkGDBServer
 
 # Use SoftDevice (setting to 0 is untested)
 NRF51_USE_SOFTDEVICE=1
@@ -68,19 +73,17 @@ NRF51_USE_SOFTDEVICE=1
 # For the S110 SoftDevice version (v7) and SDK version (v6)
 # SoftDevice takes 88kB and application 168kB
 #######################################################################################################################
-
-NRF51822_DIR=/home/dhruv/rcu/nrf51_v6/nrf51822
+NRF51822_DIR=/opt/nrf51_sdk/v6/nrf51822
 NORDIC_SDK_VERSION=6
 SOFTDEVICE_SERIES=110
-SOFTDEVICE=s110_nrf51822_7.1.0
-SOFTDEVICE_DIR_API=s110_nrf51822_7.1.0_API
+SOFTDEVICE=s110_nrf51822_7.0.0
+SOFTDEVICE_DIR_API=s110_nrf51822_7.0.0_API
 SOFTDEVICE_NO_SEPARATE_UICR_SECTION=1
 APPLICATION_START_ADDRESS=0x00016000
 APPLICATION_LENGTH=0x2a000
 RAM_R1_BASE=0x20002000
 RAM_APPLICATION_AMOUNT=8K
 
-#
 #######################################################################################################################
 # For the S130 SoftDevice version (v0.5) and the SDK version (v6)
 # SoftDevice (from inspection seems to be 110kB) and application 168kB

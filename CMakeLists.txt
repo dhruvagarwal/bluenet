@@ -13,6 +13,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 IF(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 ENDIF(COMMAND cmake_policy)
+# Load compiler options from configuration file
+MESSAGE("SSSSS arm ${CMAKE_SOURCE_DIR}")
+SET(CONFIG_FILE ${CMAKE_SOURCE_DIR}/CMakeConfig.cmake)
+SET(ARM_CONFIG_FILE ${CMAKE_SOURCE_DIR}/arm.toolchain.cmake)
+MESSAGE(STATUS "Load config file ${CONFIG_FILE}")
+INCLUDE(${CONFIG_FILE})
+#INCLUDE(${ARM_CONFIG_FILE})
+
+
+
 
 # Makes compilation go wrong first time
 SET(TEST_COMPILERS CXX C)
@@ -23,9 +33,10 @@ SET(APPLICATION_SHORTHAND "crownstone")
 
 # Set name of project
 SET(PROJECT_NAME ${APPLICATION_SHORTHAND})
-
+project (CROWNSTONE)
 # Set the main file to use for this application
-SET(MAIN_FILE "cs_main_${APPLICATION_SHORTHAND}.cpp")
+#SET(MAIN_FILE "cs_main_${APPLICATION_SHORTHAND}.cpp")
+SET(MAIN_FILE "cs_ibeacon_${APPLICATION_SHORTHAND}.cpp")
 
 # Start a project
 PROJECT(${PROJECT_NAME} ${TEST_COMPILERS})
@@ -199,9 +210,8 @@ IF(FOLDER_SOURCE STREQUAL "")
 	MESSAGE(FATAL_ERROR "No source code files found. Please add something")
 ELSE()
 	ADD_EXECUTABLE(${PROJECT_NAME} ${FOLDER_SOURCE} ${FOLDER_HEADER} ${OBJECT_FILES})
-	
-	# https://stackoverflow.com/questions/5278444/adding-a-custom-command-with-the-file-name-as-a-target
-	ADD_CUSTOM_COMMAND(OUTPUT ${PROJECT_NAME}.tmp
+
+    ADD_CUSTOM_COMMAND(OUTPUT ${PROJECT_NAME}.tmp
 		COMMAND ${CMAKE_OBJCOPY_OVERLOAD} -j .text -j .data -O binary ${PROJECT_NAME} ${PROJECT_NAME}.tmp
 		COMMAND ${CMAKE_OBJCOPY_OVERLOAD} -j .text -j .data -O ihex ${PROJECT_NAME} ${PROJECT_NAME}.hex
 		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_NAME}.tmp ${PROJECT_NAME}.bin
@@ -239,6 +249,8 @@ ELSE()
 
 	ADD_CUSTOM_TARGET(${PROJECT_NAME}.bin ALL DEPENDS ${PROJECT_NAME}.tmp)
 
+
+	# https://stackoverflow.com/questions/5278444/adding-a-custom-command-with-the-file-name-as-a-target
 	SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.bin)
 
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBS})

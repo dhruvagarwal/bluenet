@@ -17,23 +17,25 @@
  *
  * Almost all configuration options should be set in CMakeBuild.config.
  *********************************************************************************************************************/
+#define IBEACON 
 
+#define BLUETOOTH_NAME "dhruv"
 // temporary defines
 #define MESHING_PARALLEL 1
 
 // enable IBeacon functionality (advertises Crownstone as iBeacon)
-#define IBEACON
+//#define IBEACON
 
 #ifdef IBEACON
 	// define the iBeacon advertisement package parameters
 	// the proximity UUID
-	#define BEACON_UUID   "de3a6985-8872-4bb7-b784-c59ef3589844"
+	#define BEACON_UUID   "ed3a6985-8872-4bb7-b784-c59ef3589844"
 	// the major number
 	#define BEACON_MAJOR  1
     // the minor number
-	#define BEACON_MINOR  2
+	#define BEACON_MINOR  5
     // the rssi
-	#define BEACON_RSSI   0xc6
+	#define BEACON_RSSI   0xc7
 #endif
 
 // if softdevice_handler.c is used, we cannot also define SWI2_IRQHandler but will need to set evt_schedule_func in the 

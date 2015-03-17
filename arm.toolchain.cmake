@@ -17,10 +17,40 @@ SET(CMAKE_SYSTEM_VERSION 1)
 SET(CMAKE_SYSTEM_PROCESSOR arm)
 SET(CMAKE_CROSSCOMPILING 1)
 
+STRING(TIMESTAMP COMPILATION_TIME "\"%Y-%m-%d\"")
+MESSAGE('${COMPILATION_TIME}')
 # Load compiler options from configuration file
+MESSAGE("SSSSSS arm current ${CMAKE_CURRENT_SOURCE_DIR}")
+MESSAGE("SSSSS arm2 ${CMAKE_SOURCE_DIR}")
 SET(CONFIG_FILE ${CMAKE_SOURCE_DIR}/CMakeConfig.cmake)
 MESSAGE(STATUS "Load config file ${CONFIG_FILE}")
-INCLUDE(${CONFIG_FILE})
+#INCLUDE(${CONFIG_FILE})
+##################################
+
+get_filename_component(_self_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+SET(CONFIGURATION_FILE "CMakeBuild.config")
+SET(CONFIG_DIR "$ENV{BLUENET_CONFIG_DIR}")
+SET(CONFIGURATION_FILE "CMakeBuild.config")
+SET(CONFIG_DIR ${_self_dir})
+MESSAGE("SSSSS config build.config ${CMAKE_SOURCE_DIR} ${CONFIG_DIR} ")
+
+IF(EXISTS ${CONFIG_DIR}/${CONFIGURATION_FILE})
+	file(STRINGS ${CONFIG_DIR}/${CONFIGURATION_FILE} ConfigContents)
+	foreach(NameAndValue ${ConfigContents})
+		# Strip leading spaces
+		string(REGEX REPLACE "^[ ]+" "" NameAndValue ${NameAndValue})
+		# Find variable name
+		string(REGEX MATCH "^[^=]+" Name ${NameAndValue})
+		# Find the value
+		string(REPLACE "${Name}=" "" Value ${NameAndValue})
+		# Set the variable
+		set(${Name} "${Value}")
+	endforeach()
+else()
+	MESSAGE(FATAL_ERROR "Could not find file ${CONFIG_DIR}/${CONFIGURATION_FILE} , copy from ${CONFIGURATION_FILE}.default and adjust!")
+endif()
+###################################
 
 UNSET(CMAKE_TRY_COMPILE_CONFIGURATION)
 
@@ -66,9 +96,9 @@ SET(OPTIMIZE "-Os -fomit-frame-pointer ${FLAG_MATH} ${FLAG_LINK_TIME_OPTIMIZATIO
 # Collect flags that are used in the code, as macros
 #ADD_DEFINITIONS("-MMD -DNRF51 -DEPD_ENABLE_EXTRA_RAM -DARDUINO=100 -DE_STICKY_v1 -DNRF51_USE_SOFTDEVICE=${NRF51_USE_SOFTDEVICE} -DUSE_RENDER_CONTEXT -DSYSCALLS -DUSING_FUNC")
 ADD_DEFINITIONS("-MMD -DNRF51 -DEPD_ENABLE_EXTRA_RAM -DNRF51_USE_SOFTDEVICE=${NRF51_USE_SOFTDEVICE} -DUSE_RENDER_CONTEXT -DSYSCALLS -DUSING_FUNC")
-
 # Pass variables in defined in the configuration file to the compiler
 ADD_DEFINITIONS("-DNRF51822_DIR=${NRF51822_DIR}")
+MESSAGE("SSSSS dir ${NRF51822_DIR}")
 ADD_DEFINITIONS("-DNORDIC_SDK_VERSION=${NORDIC_SDK_VERSION}")
 ADD_DEFINITIONS("-DSOFTDEVICE_SERIES=${SOFTDEVICE_SERIES}")
 ADD_DEFINITIONS("-DSOFTDEVICE=${SOFTDEVICE}")
@@ -90,10 +120,10 @@ ADD_DEFINITIONS("-DMESHING=${MESHING}")
 
 # only required if Nordic files are used
 ADD_DEFINITIONS("-DBOARD_NRF6310")
-
+ADD_DEFINITIONS("-DBLUETOOTH_NAME=\"dhruv\"")
 # the bluetooth name is optional
 IF(BLUETOOTH_NAME)
-	ADD_DEFINITIONS("-DBLUETOOTH_NAME=${BLUETOOTH_NAME}")
+	ADD_DEFINITIONS("-DBLUETOOTH_NAME=\"dhruv\"")
 ELSE()
 	MESSAGE(FATAL_ERROR "We require a BLUETOOTH_NAME in CMakeBuild.config (5 characters or less), i.e. \"Crown\" (with quotes)")
 ENDIF()
@@ -110,7 +140,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g3 -Wall ${OPTIMIZE} -mcpu=cortex-m0 -mthum
 
 # Tell the linker that we use a special memory layout
 SET(FILE_MEMORY_LAYOUT "-TnRF51822-softdevice.ld") 
-SET(PATH_FILE_MEMORY "-L${PROJECT_SOURCE_DIR}/conf") 
+SET(PATH_FILE_MEMORY "-L${_self_dir}/conf") 
 
 # http://public.kitware.com/Bug/view.php?id=12652
 # CMake does send the compiler flags also to the linker
@@ -119,7 +149,7 @@ SET(FLAG_WRITE_MAP_FILE "-Wl,-Map,prog.map")
 SET(FLAG_REMOVE_UNWINDING_CODE "-Wl,--wrap,__aeabi_unwind_cpp_pr0")
 
 # do not define above as multiple linker flags, or else you will get redefines of MEMORY etc.
-SET(CMAKE_EXE_LINKER_FLAGS "${PATH_FILE_MEMORY} ${FILE_MEMORY_LAYOUT} -Wl,--gc-sections ${CMAKE_EXE_LINKER_FLAGS} ${FLAG_WRITE_MAP_FILE} ${FLAG_REMOVE_UNWINDING_CODE}")
+SET(CMAKE_EXE_LINKER_FLAGS "${PATH_FILE_MEMORY} ${FILE_MEMORY_LAYOUT} -Wl,--gc-sections  ${FLAG_WRITE_MAP_FILE} ${FLAG_REMOVE_UNWINDING_CODE}")
 
 # We preferably want to run the cross-compiler tests without all the flags. This namely means we have to add for example the object out of syscalls.c to the compilation, etc. Or, differently, have different flags for the compiler tests. This is difficult to do!
 #SET(CMAKE_C_FLAGS "-nostdlib")
